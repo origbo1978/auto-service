@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Register | Auto Serve Ng{% endblock %}
+{% block navbar_class %}navbar-solid{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 120px 20px 60px; }
+    .auth-card { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 40px; width: 100%; max-width: 480px; }
+    .auth-title { font-size: 28px; font-weight: 800; margin-bottom: 8px; text-align: center; }
+    .auth-subtitle { font-size: 14px; color: #888; text-align: center; margin-bottom: 30px; }
+    .form-group { margin-bottom: 18px; }
+    .form-label { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 8px; }
+    .form-input { width: 100%; background: #0b0c10; border: 1px solid #222; color: #fff; padding: 14px 16px; border-radius: 6px; font-size: 14px; outline: none; transition: border 0.3s; font-family: 'Montserrat', sans-serif; }
+    .form-input:focus { border-color: #39b54a; }
+    .submit-btn { width: 100%; background: #39b54a; color: #fff; border: none; padding: 16px; border-radius: 6px; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: opacity 0.3s; margin-top: 10px; }
+    .submit-btn:hover { opacity: 0.9; }
+    .auth-footer { text-align: center; margin-top: 25px; font-size: 14px; color: #888; }
+    .auth-footer a { color: #39b54a; font-weight: 700; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h1 class="auth-title">Create Account</h1>
+        <p class="auth-subtitle">Join the Auto Serve Ng network today</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-input" placeholder="Choose a username" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-input" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" name="phone" class="form-input" placeholder="+234 800 000 0000" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-input" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="submit-btn">Create Account</button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account? <a href="/accounts/login/">Log in here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

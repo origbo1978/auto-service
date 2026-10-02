@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block title %}{{ workshop.name }} | Auto Serve Ng{% endblock %}
+{% block navbar_class %}navbar-solid{% endblock %}
+
+{% block extra_css %}
+<style>
+    .workshop-hero { height: 300px; background: linear-gradient(135deg, #141414, #1a1a1a); position: relative; margin-top: 90px; display: flex; align-items: center; justify-content: center; font-size: 80px; font-weight: 800; color: #39b54a; overflow: hidden; }
+    .workshop-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, #0b0c10, transparent 60%); }
+    .workshop-hero-text { position: relative; z-index: 2; }
+    .detail-container { max-width: 1100px; margin: 0 auto; padding: 0 6% 80px; }
+    .back-link { display: inline-block; color: #888; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 20px 0 15px; transition: color 0.3s; }
+    .back-link:hover { color: #39b54a; }
+    .workshop-header { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 30px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px; }
+    .workshop-title { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+    .workshop-meta { display: flex; gap: 20px; color: #888; font-size: 14px; flex-wrap: wrap; }
+    .verified-badge { background: rgba(57,181,74,0.15); color: #39b54a; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid rgba(57,181,74,0.3); display: inline-block; }
+    .section-tag { color: #39b54a; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; display: block; }
+    .section-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; }
+
+    /* DEPARTMENTS GRID */
+    .dept-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 40px; }
+    .dept-card { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 25px 20px; text-align: center; cursor: pointer; transition: all 0.3s; text-decoration: none; color: #fff; display: block; }
+    .dept-card:hover { border-color: #39b54a; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(57,181,74,0.08); }
+    .dept-card.active { border-color: #39b54a; background: rgba(57,181,74,0.05); }
+    .dept-icon { font-size: 32px; margin-bottom: 12px; }
+    .dept-name { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+    .dept-count { font-size: 12px; color: #888; }
+
+    /* SERVICES */
+    .services-section { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 30px; }
+    .services-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .services-title { font-size: 18px; font-weight: 700; }
+    .back-to-dept { color: #888; font-size: 13px; font-weight: 700; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: color 0.3s; }
+    .back-to-dept:hover { color: #39b54a; }
+    .services-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .service-item { background: #0b0c10; border: 1px solid #222; padding: 20px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; transition: border 0.3s; }
+    .service-item:hover { border-color: #39b54a; }
+    .service-name { font-weight: 700; font-size: 15px; }
+    .service-desc { font-size: 12px; color: #888; line-height: 1.5; }
+    .service-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+    .service-price { color: #39b54a; font-weight: 800; font-size: 18px; }
+    .service-duration { font-size: 12px; color: #888; }
+    .book-service-btn { display: block; background: #39b54a; color: #fff; text-align: center; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 700; text-transform: uppercase; transition: opacity 0.3s; margin-top: 10px; }
+    .book-service-btn:hover { opacity: 0.9; }
+    .login-to-book { display: block; background: transparent; color: #39b54a; text-align: center; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(57,181,74,0.3); margin-top: 10px; }
+
+    .no-dept { text-align: center; padding: 40px; color: #888; }
+    .no-dept h3 { font-size: 18px; color: #fff; margin-bottom: 10px; }
+
+    @media (max-width: 768px) {
+        .dept-grid { grid-template-columns: repeat(2, 1fr); }
+        .services-list { grid-template-columns: 1fr; }
+        .workshop-hero { height: 200px; font-size: 48px; }
+    }
+    @media (max-width: 480px) {
+        .dept-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="workshop-hero">
+    <div class="workshop-hero-text">{{ workshop.name|slice:":2"|upper }}</div>
+</div>
+
+<div class="detail-container">
+    <a href="/workshops/" class="back-link">← Back to Workshops</a>
+
+    <div class="workshop-header">
+        <div>
+            <h1 class="workshop-title">{{ workshop.name }}</h1>
+            <div class="workshop-meta">
+                <span>📍 {{ workshop.address }}</span>
+                <span>📞 {{ workshop.phone }}</span>
+            </div>
+        </div>
+        <span class="verified-badge">✓ Verified Workshop</span>
+    </div>
+
+    {% if not selected_dept %}
+    <!-- SHOW DEPARTMENTS -->
+    <span class="section-tag">What do you need?</span>
+    <h2 class="section-title">Select a Department</h2>
+
+    {% if departments %}
+    <div class="dept-grid">
+        {% for dept in departments %}
+        <a href="/workshops/{{ workshop.id }}/?dept={{ dept.key }}" class="dept-card">
+            <div class="dept-icon">
+                {% if dept.key == 'mechanical' %}🔧
+                {% elif dept.key == 'electrical' %}⚡
+                {% elif dept.key == 'tyres' %}🛞
+                {% elif dept.key == 'ac_cooling' %}❄️
+                {% elif dept.key == 'body_paint' %}🎨
+                {% elif dept.key == 'oils_fluids' %}🛢️
+                {% endif %}
+            </div>
+            <div class="dept-name">{{ dept.label }}</div>
+            <div class="dept-count">{{ dept.count }} service{{ dept.count|pluralize }} available</div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-dept">
+        <h3>No services available yet</h3>
+        <p>This workshop hasn't added any services yet. Check back soon!</p>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- SHOW SERVICES IN SELECTED DEPARTMENT -->
+    <div class="services-section">
+        <div class="services-header">
+            <div>
+                <span class="section-tag">{{ selected_dept_label }}</span>
+                <div class="services-title">Available Services</div>
+            </div>
+            <a href="/workshops/{{ workshop.id }}/" class="back-to-dept">← All Departments</a>
+        </div>
+
+        {% if selected_services %}
+        <div class="services-list">
+            {% for service in selected_services %}
+            <div class="service-item">
+                <div class="service-name">{{ service.name }}</div>
+                {% if service.description %}
+                <div class="service-desc">{{ service.description }}</div>
+                {% endif %}
+                <div class="service-bottom">
+                    <div>
+                        <div class="service-price">₦{{ service.price }}</div>
+                        <div class="service-duration">⏱ {{ service.duration_minutes }} mins</div>
+                    </div>
+                </div>
+                {% if user.is_authenticated %}
+                <a href="/bookings/create/?service={{ service.id }}" class="book-service-btn">Book Now</a>
+                {% else %}
+                <a href="/accounts/login/" class="login-to-book">Login to Book</a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-dept">
+            <h3>No services in this department</h3>
+            <p>Check back soon or browse other departments.</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

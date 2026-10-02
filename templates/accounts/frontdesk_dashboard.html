@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block title %}Front Desk | Auto Serve Ng{% endblock %}
+{% block navbar_class %}navbar-solid{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container { padding: 120px 6% 60px; max-width: 1200px; margin: 0 auto; }
+    .page-header { margin-bottom: 30px; }
+    .page-title { font-size: 28px; font-weight: 800; margin-bottom: 5px; }
+    .page-sub { font-size: 14px; color: #888; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+    .stat-card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 25px; }
+    .stat-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .stat-value { font-size: 32px; font-weight: 800; }
+    .section-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; }
+    .booking-card { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 25px; margin-bottom: 15px; transition: border 0.3s; }
+    .booking-card:hover { border-color: #39b54a; }
+    .booking-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; }
+    .booking-customer { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .booking-meta { font-size: 13px; color: #888; }
+    .booking-issue { display: inline-block; background: rgba(57,181,74,0.1); color: #39b54a; border: 1px solid rgba(57,181,74,0.2); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-top: 6px; }
+    .booking-notes { font-size: 13px; color: #aaa; font-style: italic; margin-top: 8px; background: #0b0c10; padding: 10px 14px; border-radius: 6px; border-left: 2px solid #39b54a; }
+    .status-badge { padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .badge-pending { background: rgba(245,166,35,0.15); color: #f5a623; }
+    .badge-assigned { background: rgba(57,181,74,0.15); color: #39b54a; }
+    .badge-in_progress { background: rgba(57,181,74,0.2); color: #39b54a; border: 1px solid #39b54a; }
+    .badge-completed { background: rgba(255,255,255,0.08); color: #ccc; }
+    .badge-cancelled { background: rgba(255,59,48,0.15); color: #ff3b30; }
+    .assign-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 15px; padding-top: 15px; border-top: 1px solid #222; }
+    .assign-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #888; }
+    .assign-select { background: #0b0c10; border: 1px solid #222; color: #fff; padding: 10px 14px; border-radius: 6px; font-size: 13px; font-family: 'Montserrat', sans-serif; outline: none; transition: border 0.3s; flex: 1; min-width: 180px; }
+    .assign-select:focus { border-color: #39b54a; }
+    .assign-btn { background: #39b54a; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Montserrat', sans-serif; text-transform: uppercase; transition: opacity 0.3s; white-space: nowrap; }
+    .assign-btn:hover { opacity: 0.9; }
+    .assigned-to { font-size: 13px; color: #39b54a; font-weight: 700; margin-top: 10px; padding-top: 10px; border-top: 1px solid #222; }
+    option { background: #141414; }
+    @media (max-width: 768px) { .assign-form { flex-direction: column; align-items: flex-start; } .assign-select { width: 100%; } .assign-btn { width: 100%; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="page-header">
+        <h1 class="page-title">Front Desk — <span style="color:#39b54a;">{{ workshop.name }}</span></h1>
+        <div class="page-sub">Manage and assign incoming bookings to technicians</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Bookings</div>
+            <div class="stat-value">{{ bookings|length }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Pending</div>
+            <div class="stat-value" style="color:#f5a623;">
+                {{ bookings|length }}
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Technicians</div>
+            <div class="stat-value" style="color:#39b54a;">{{ mechanics|length }}</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">All Bookings</h2>
+
+    {% for booking in bookings %}
+    <div class="booking-card">
+        <div class="booking-top">
+            <div>
+                <div class="booking-customer">{{ booking.customer.username }}</div>
+                <div class="booking-meta">{{ booking.service.name }} · {{ booking.workshop.name }}</div>
+                <div class="booking-meta">📅 {{ booking.booking_date }} · ⏰ {{ booking.booking_time }}</div>
+                {% if booking.issue_category %}
+                <span class="booking-issue">{{ booking.get_issue_category_display }}</span>
+                {% endif %}
+                {% if booking.notes %}
+                <div class="booking-notes">"{{ booking.notes }}"</div>
+                {% endif %}
+            </div>
+            <span class="status-badge badge-{{ booking.status }}">{{ booking.get_status_display }}</span>
+        </div>
+
+        {% if booking.assigned_to %}
+        <div class="assigned-to">✓ Assigned to: {{ booking.assigned_to.username }}</div>
+        {% endif %}
+
+        {% if booking.status != 'completed' and booking.status != 'cancelled' %}
+        <form method="POST" class="assign-form">
+            {% csrf_token %}
+            <input type="hidden" name="booking_id" value="{{ booking.id }}">
+            <span class="assign-label">Assign to:</span>
+            <select name="mechanic_id" class="assign-select" required>
+                <option value="">Select Technician</option>
+                {% for mechanic in mechanics %}
+                <option value="{{ mechanic.user.id }}" {% if booking.assigned_to == mechanic.user %}selected{% endif %}>
+                    {{ mechanic.user.username }}
+                    {% if mechanic.specialization %} — {{ mechanic.specialization }}{% endif %}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="assign-btn">Assign</button>
+        </form>
+        {% endif %}
+    </div>
+    {% empty %}
+    <div style="text-align:center; padding:60px; color:#888;">
+        <div style="font-size:48px; margin-bottom:15px;">📋</div>
+        <div style="font-size:18px; color:#fff; margin-bottom:8px;">No bookings yet</div>
+        <div>Bookings will appear here when customers make appointments</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

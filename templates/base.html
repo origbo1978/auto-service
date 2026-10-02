@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Auto Serve Ng{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    {% load static %}
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: #0b0c10; color: #ffffff; overflow-x: hidden; width: 100%; }
+        .green-text { color: #39b54a; }
+        a { text-decoration: none; color: inherit; }
+
+        /* NAVBAR */
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; height: 90px; display: flex; justify-content: space-between; align-items: center; padding: 0 4%; z-index: 1000; background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0)); }
+        .logo { font-size: 24px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff; white-space: nowrap; }
+        .nav-menu { display: flex; background: #141414; height: 60px; align-items: center; padding: 0 40px; margin-top: -30px; clip-path: polygon(25px 0%, calc(100% - 25px) 0%, 100% 100%, 0% 100%); }
+        .nav-item { color: #ffffff; text-decoration: none; font-size: 13px; font-weight: 700; margin: 0 15px; position: relative; padding: 5px 0; transition: color 0.3s; text-transform: uppercase; letter-spacing: 0.5px; }
+        .nav-item:hover, .nav-item.active { color: #39b54a; }
+        .cta-btn { display: flex; align-items: center; color: #ffffff; text-decoration: none; font-size: 13px; font-weight: 700; letter-spacing: 1px; white-space: nowrap; }
+        .cta-btn:hover { opacity: 0.8; }
+        .calendar-icon { width: 18px; height: 18px; margin-right: 8px; color: #39b54a; }
+
+        /* SOLID NAVBAR for inner pages */
+        .navbar-solid { background: #141414 !important; border-bottom: 1px solid #222; }
+
+        /* ALERTS */
+        .alert-container { position: fixed; top: 100px; right: 20px; z-index: 9999; max-width: 350px; }
+        .alert { padding: 14px 18px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; font-weight: 600; }
+        .alert-success { background: rgba(57,181,74,0.15); color: #39b54a; border: 1px solid rgba(57,181,74,0.3); }
+        .alert-error { background: rgba(255,59,48,0.15); color: #ff3b30; border: 1px solid rgba(255,59,48,0.3); }
+        .alert-info { background: rgba(57,181,74,0.1); color: #39b54a; border: 1px solid rgba(57,181,74,0.2); }
+
+        /* HAMBURGER */
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+        .hamburger span { width: 24px; height: 2px; background: #fff; border-radius: 2px; }
+
+        @media (max-width: 768px) {
+            .navbar { height: 70px; padding: 0 5%; background: #0b0c10 !important; border-bottom: 1px solid #1a1a1a; }
+            .nav-menu { display: none; }
+            .hamburger { display: flex; }
+            .mobile-menu { display: none; position: fixed; top: 70px; left: 0; width: 100%; background: #141414; border-bottom: 1px solid #222; padding: 20px 5%; z-index: 999; flex-direction: column; gap: 0; }
+            .mobile-menu.open { display: flex; }
+            .mobile-menu a { padding: 14px 0; font-size: 14px; font-weight: 700; color: #ccc; text-transform: uppercase; border-bottom: 1px solid #222; }
+            .mobile-menu a:last-child { border-bottom: none; }
+            .mobile-menu a:hover { color: #39b54a; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<header class="navbar {% block navbar_class %}{% endblock %}">
+    <a href="/" class="logo">Auto Serve <span class="green-text">Ng</span></a>
+
+    <nav class="nav-menu">
+        <a href="/" class="nav-item {% block nav_home %}{% endblock %}">Home</a>
+        <a href="/workshops/" class="nav-item {% block nav_workshops %}{% endblock %}">Workshops</a>
+        {% if user.is_authenticated %}
+            <a href="/bookings/" class="nav-item {% block nav_bookings %}{% endblock %}">My Bookings</a>
+            {% if user.workshop %}
+                <a href="/workshops/dashboard/" class="nav-item {% block nav_dashboard %}{% endblock %}">Dashboard</a>
+            {% endif %}
+            <a href="/accounts/profile/" class="nav-item" style="color:#39b54a;">{{ user.username }}</a>
+            <a href="/accounts/logout/" class="nav-item">Logout</a>
+        {% else %}
+            <a href="/accounts/login/" class="nav-item {% block nav_account %}{% endblock %}">Account</a>
+        {% endif %}
+    </nav>
+
+    <div class="hamburger" onclick="toggleMobile()">
+        <span></span><span></span><span></span>
+    </div>
+
+    <a href="/workshops/" class="cta-btn">
+        <svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        FIND WORKSHOP
+    </a>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+    <a href="/">Home</a>
+    <a href="/workshops/">Workshops</a>
+    {% if user.is_authenticated %}
+        <a href="/bookings/">My Bookings</a>
+        {% if user.workshop %}
+            <a href="/workshops/dashboard/">Dashboard</a>
+        {% endif %}
+        <a href="/accounts/profile/" style="color:#39b54a;">{{ user.username }}</a>
+        <a href="/accounts/logout/">Logout</a>
+    {% else %}
+        <a href="/accounts/login/">Login</a>
+        <a href="/accounts/register/">Register</a>
+    {% endif %}
+</div>
+
+{% if messages %}
+<div class="alert-container">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% block content %}{% endblock %}
+
+<script>
+function toggleMobile() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+}
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

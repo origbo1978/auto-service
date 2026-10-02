@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Technician Dashboard | Auto Serve Ng{% endblock %}
+{% block navbar_class %}navbar-solid{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container { padding: 120px 6% 60px; max-width: 1000px; margin: 0 auto; }
+    .page-header { margin-bottom: 30px; }
+    .page-title { font-size: 28px; font-weight: 800; margin-bottom: 5px; }
+    .page-sub { font-size: 14px; color: #888; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 40px; }
+    .stat-card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 25px; }
+    .stat-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .stat-value { font-size: 32px; font-weight: 800; }
+    .section-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; }
+    .job-card { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 25px; margin-bottom: 15px; border-left: 3px solid #39b54a; transition: border 0.3s; }
+    .job-card:hover { border-color: #39b54a; box-shadow: 0 4px 15px rgba(57,181,74,0.08); }
+    .job-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; }
+    .job-service { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .job-meta { font-size: 13px; color: #888; margin-bottom: 4px; }
+    .job-customer { font-size: 13px; color: #ccc; font-weight: 600; }
+    .issue-badge { display: inline-block; background: rgba(57,181,74,0.1); color: #39b54a; border: 1px solid rgba(57,181,74,0.2); padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-top: 8px; }
+    .job-notes { font-size: 13px; color: #aaa; font-style: italic; margin-top: 10px; background: #0b0c10; padding: 12px 16px; border-radius: 6px; border-left: 2px solid #39b54a; }
+    .status-badge { padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .badge-assigned { background: rgba(57,181,74,0.15); color: #39b54a; }
+    .badge-in_progress { background: rgba(57,181,74,0.2); color: #39b54a; border: 1px solid #39b54a; }
+    .badge-completed { background: rgba(255,255,255,0.08); color: #ccc; }
+    .update-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 15px; padding-top: 15px; border-top: 1px solid #222; }
+    .update-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #888; white-space: nowrap; }
+    .status-select { background: #0b0c10; border: 1px solid #222; color: #fff; padding: 10px 14px; border-radius: 6px; font-size: 13px; font-family: 'Montserrat', sans-serif; outline: none; transition: border 0.3s; flex: 1; min-width: 160px; }
+    .status-select:focus { border-color: #39b54a; }
+    .update-btn { background: #39b54a; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Montserrat', sans-serif; text-transform: uppercase; white-space: nowrap; transition: opacity 0.3s; }
+    .update-btn:hover { opacity: 0.9; }
+    option { background: #141414; }
+    @media (max-width: 768px) { .update-form { flex-direction: column; align-items: flex-start; } .status-select { width: 100%; } .update-btn { width: 100%; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="page-header">
+        <h1 class="page-title">Technician Dashboard</h1>
+        <div class="page-sub">Welcome, <span style="color:#39b54a;">{{ request.user.username }}</span> — here are your assigned jobs</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Jobs</div>
+            <div class="stat-value">{{ bookings|length }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">In Progress</div>
+            <div class="stat-value" style="color:#39b54a;">
+                {% with bookings|length as total %}{{ total }}{% endwith %}
+            </div>
+        </div>
+    </div>
+
+    <h2 class="section-title">My Assigned Jobs</h2>
+
+    {% for booking in bookings %}
+    <div class="job-card">
+        <div class="job-top">
+            <div>
+                <div class="job-service">{{ booking.service.name }}</div>
+                <div class="job-meta">{{ booking.workshop.name }} · 📅 {{ booking.booking_date }} · ⏰ {{ booking.booking_time }}</div>
+                <div class="job-customer">👤 Customer: {{ booking.customer.username }}</div>
+                {% if booking.issue_category %}
+                <span class="issue-badge">🔍 {{ booking.get_issue_category_display }}</span>
+                {% endif %}
+                {% if booking.notes %}
+                <div class="job-notes">"{{ booking.notes }}"</div>
+                {% endif %}
+            </div>
+            <span class="status-badge badge-{{ booking.status }}">{{ booking.get_status_display }}</span>
+        </div>
+
+        {% if booking.status != 'completed' %}
+        <form method="POST" class="update-form">
+            {% csrf_token %}
+            <input type="hidden" name="booking_id" value="{{ booking.id }}">
+            <span class="update-label">Update Status:</span>
+            <select name="status" class="status-select">
+                <option value="assigned" {% if booking.status == 'assigned' %}selected{% endif %}>Assigned</option>
+                <option value="in_progress" {% if booking.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                <option value="completed" {% if booking.status == 'completed' %}selected{% endif %}>Completed</option>
+            </select>
+            <button type="submit" class="update-btn">Update</button>
+        </form>
+        {% endif %}
+    </div>
+    {% empty %}
+    <div style="text-align:center; padding:60px; color:#888;">
+        <div style="font-size:48px; margin-bottom:15px;">🔧</div>
+        <div style="font-size:18px; color:#fff; margin-bottom:8px;">No jobs assigned yet</div>
+        <div>The front desk will assign jobs to you shortly</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

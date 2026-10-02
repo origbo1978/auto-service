@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Add Service | Auto Serve Ng{% endblock %}
+{% block navbar_class %}navbar-solid{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container { padding: 120px 6% 80px; max-width: 600px; margin: 0 auto; }
+    .back-link { display: inline-block; color: #888; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 25px; transition: color 0.3s; }
+    .back-link:hover { color: #39b54a; }
+    .form-card { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 40px; border-top: 2px solid #39b54a; }
+    .form-title { font-size: 24px; font-weight: 800; margin-bottom: 5px; }
+    .form-sub { font-size: 13px; color: #888; margin-bottom: 30px; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 8px; }
+    .form-input, .form-textarea, .form-select { width: 100%; background: #0b0c10; border: 1px solid #222; color: #fff; padding: 14px 16px; border-radius: 6px; font-size: 14px; outline: none; transition: border 0.3s; font-family: 'Montserrat', sans-serif; }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: #39b54a; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .submit-btn { width: 100%; background: #39b54a; color: #fff; border: none; padding: 16px; border-radius: 6px; font-size: 14px; font-weight: 800; text-transform: uppercase; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: opacity 0.3s; margin-top: 10px; }
+    .submit-btn:hover { opacity: 0.9; }
+    option { background: #141414; }
+    @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .form-card { padding: 25px; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <a href="/workshops/dashboard/" class="back-link">← Back to Dashboard</a>
+    <div class="form-card">
+        <h2 class="form-title">Add New Service</h2>
+        <p class="form-sub">{{ workshop.name }}</p>
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label">Department</label>
+                <select name="department" class="form-select" required>
+                    {% for key, label in department_choices %}
+                    <option value="{{ key }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Service Name</label>
+                <input type="text" name="name" class="form-input" placeholder="e.g. Engine Repair" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-textarea" rows="3" placeholder="Brief description..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Price (₦)</label>
+                    <input type="number" name="price" class="form-input" placeholder="15000" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Duration (mins)</label>
+                    <input type="number" name="duration_minutes" class="form-input" placeholder="60" required>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Add Service</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
