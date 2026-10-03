@@ -1,3 +1,4 @@
+import os
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -5,7 +6,7 @@ from django.contrib import messages
 from services.models import Service
 from .models import Booking, ISSUE_CATEGORIES
 
-BREVO_API_KEY = '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' 
+BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '')
 
 def send_booking_email(to_email, username, service, booking_date, booking_time):
     try:

@@ -141,7 +141,7 @@ EMAIL_HOST = 'smtp-relay.brevo.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'aac05f001@smtp-brevo.com'
-EMAIL_HOST_PASSWORD = 'xsmtpsib-41f5b7d75246fbd9afe85a2c9b72d54c043cdbf4f297c5e30422d3449091f52a-dYo6DLPVzqH3E8ZB'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = 'AutoServe NG <aac05f001@smtp-brevo.com>'
 
 
